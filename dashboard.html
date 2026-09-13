@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | MGGS Staff</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <header class="bg-blue-900 text-white">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+      <div>
+        <div class="font-bold">MGGS Staff Panel</div>
+        <div class="text-xs text-blue-200" id="userInfo">Loading...</div>
+      </div>
+      <div class="flex gap-3 text-sm">
+        <a href="index.html" class="hover:text-yellow-300">Website</a>
+        <a href="upload.html" class="hover:text-yellow-300">Upload</a>
+        <a href="results.html" class="hover:text-yellow-300">Results</a>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded">Logout</button>
+      </div>
+    </div>
+  </header>
+  <div class="bg-white border-b sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto text-sm">
+      <button data-tab="admissions" class="tab-btn px-4 py-3 font-medium border-b-2 border-blue-600 text-blue-700">Admissions</button>
+      <button data-tab="students" class="tab-btn px-4 py-3 font-medium text-gray-600">Students</button>
+      <button data-tab="results" class="tab-btn px-4 py-3 font-medium text-gray-600">Results</button>
+      <button data-tab="notices" class="tab-btn px-4 py-3 font-medium text-gray-600">Notices</button>
+      <button data-tab="messages" class="tab-btn px-4 py-3 font-medium text-gray-600">Messages</button>
+    </div>
+  </div>
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <section id="tab-admissions" class="tab-panel">
+      <h2 class="text-xl font-bold mb-4">Admission Applications</h2>
+      <div id="admissionsList" class="space-y-3"></div>
+    </section>
+    <section id="tab-students" class="tab-panel hidden">
+      <h2 class="text-xl font-bold mb-4">Students</h2>
+      <form id="studentForm" class="bg-white border rounded-xl p-4 mb-4 grid sm:grid-cols-2 gap-2 text-sm">
+        <input name="name" placeholder="Name *" required class="border rounded px-3 py-2" />
+        <select name="class" required class="border rounded px-3 py-2"><option value="">Class</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
+        <input name="mobile" placeholder="Parent Mobile *" required class="border rounded px-3 py-2" />
+        <input name="father" placeholder="Father Name" class="border rounded px-3 py-2" />
+        <button type="submit" class="bg-blue-700 text-white rounded px-4 py-2 sm:col-span-2">Add Student</button>
+      </form>
+      <div id="studentsList" class="space-y-2"></div>
+    </section>
+    <section id="tab-results" class="tab-panel hidden">
+      <h2 class="text-xl font-bold mb-4">Results (Class 5-12)</h2>
+      <form id="resultForm" class="bg-white border rounded-xl p-4 mb-4 grid sm:grid-cols-3 gap-2 text-sm">
+        <input name="roll" placeholder="Roll *" required class="border rounded px-3 py-2" />
+        <input name="name" placeholder="Name *" required class="border rounded px-3 py-2" />
+        <select name="class" required class="border rounded px-3 py-2"><option value="">Class</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
+        <input name="year" value="2025" class="border rounded px-3 py-2" />
+        <input name="percentage" placeholder="%" class="border rounded px-3 py-2" />
+        <select name="result" class="border rounded px-3 py-2"><option>Pass</option><option>Fail</option></select>
+        <button type="submit" class="bg-green-600 text-white rounded px-4 py-2 sm:col-span-3">Save Result</button>
+      </form>
+      <div id="resultsList" class="space-y-2"></div>
+    </section>
+    <section id="tab-notices" class="tab-panel hidden">
+      <h2 class="text-xl font-bold mb-4">Notices</h2>
+      <form id="noticeForm" class="bg-white border rounded-xl p-4 mb-4 space-y-2">
+        <input name="title" placeholder="Title *" required class="w-full border rounded px-3 py-2" />
+        <textarea name="content" rows="3" placeholder="Content *" required class="w-full border rounded px-3 py-2"></textarea>
+        <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded">Publish</button>
+      </form>
+      <div id="noticesList" class="space-y-2"></div>
+    </section>
+    <section id="tab-messages" class="tab-panel hidden">
+      <h2 class="text-xl font-bold mb-4">Contact Messages</h2>
+      <div id="messagesList" class="space-y-2"></div>
+    </section>
+  </main>
+  <script>
+    const session = JSON.parse(localStorage.getItem('mggs_session') || 'null');
+    if (!session) location.href = 'login.html';
+    else document.getElementById('userInfo').textContent = (session.name || session.email || 'Staff') + ' (' + (session.role || 'teacher') + ')';
+    function logout() { localStorage.removeItem('mggs_session'); location.href = 'login.html'; }
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('border-b-2','border-blue-600','text-blue-700'); b.classList.add('text-gray-600'); });
+        btn.classList.add('border-b-2','border-blue-600','text-blue-700'); btn.classList.remove('text-gray-600');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+        if (btn.dataset.tab === 'admissions') loadAdmissions();
+        if (btn.dataset.tab === 'students') loadStudents();
+        if (btn.dataset.tab === 'results') loadResults();
+        if (btn.dataset.tab === 'notices') loadNotices();
+        if (btn.dataset.tab === 'messages') loadMessages();
+      });
+    });
+    function loadAdmissions() {
+      const list = JSON.parse(localStorage.getItem('mggs_admissions') || '[]');
+      const box = document.getElementById('admissionsList');
+      if (!list.length) { box.innerHTML = '<p class="text-gray-500 text-sm">No applications yet.</p>'; return; }
+      box.innerHTML = list.map((a,i) => '<div class="bg-white border rounded-xl p-4 text-sm flex flex-wrap justify-between gap-2"><div><span class="font-mono text-xs text-blue-600">'+a.id+'</span><h4 class="font-semibold">'+a.studentName+' — Class '+a.class+'</h4><p class="text-gray-600">'+(a.fatherName||'')+' | '+(a.parentMobile||'')+'</p></div><div class="flex flex-col gap-1 items-end"><span class="text-xs px-2 py-0.5 rounded bg-yellow-100">'+(a.status||'Pending')+'</span><div class="flex gap-1"><button onclick="updAdm('+i+',\'Approved\')" class="text-xs bg-green-600 text-white px-2 py-1 rounded">Approve</button><button onclick="updAdm('+i+',\'Rejected\')" class="text-xs bg-red-500 text-white px-2 py-1 rounded">Reject</button></div></div></div>').join('');
+    }
+    function updAdm(i,s){ const l=JSON.parse(localStorage.getItem('mggs_admissions')||'[]'); l[i].status=s; localStorage.setItem('mggs_admissions',JSON.stringify(l)); loadAdmissions(); }
+    document.getElementById('studentForm').onsubmit = function(e){ e.preventDefault(); const d=Object.fromEntries(new FormData(this)); d.id='STU'+Date.now().toString().slice(-6); const l=JSON.parse(localStorage.getItem('mggs_students')||'[]'); l.unshift(d); localStorage.setItem('mggs_students',JSON.stringify(l)); this.reset(); loadStudents(); };
+    function loadStudents(){ const l=JSON.parse(localStorage.getItem('mggs_students')||'[]'); document.getElementById('studentsList').innerHTML = l.length ? l.map(s=>'<div class="bg-white border rounded p-3 text-sm">'+s.name+' — Class '+s.class+' | '+s.mobile+'</div>').join('') : '<p class="text-gray-500 text-sm">No students.</p>'; }
+    document.getElementById('resultForm').onsubmit = function(e){ e.preventDefault(); const d=Object.fromEntries(new FormData(this)); d.id='RES'+Date.now().toString().slice(-6); const l=JSON.parse(localStorage.getItem('mggs_results')||'[]'); l.unshift(d); localStorage.setItem('mggs_results',JSON.stringify(l)); this.reset(); this.year.value='2025'; loadResults(); };
+    function loadResults(){ const l=JSON.parse(localStorage.getItem('mggs_results')||'[]'); document.getElementById('resultsList').innerHTML = l.length ? l.map(r=>'<div class="bg-white border rounded p-3 text-sm">'+r.roll+' | '+r.name+' | Class '+r.class+' | '+(r.percentage||'-')+'% | '+r.result+'</div>').join('') : '<p class="text-gray-500 text-sm">No results.</p>'; }
+    document.getElementById('noticeForm').onsubmit = function(e){ e.preventDefault(); const d=Object.fromEntries(new FormData(this)); d.date=new Date().toLocaleDateString('en-IN'); const l=JSON.parse(localStorage.getItem('mggs_notices')||'[]'); l.unshift(d); localStorage.setItem('mggs_notices',JSON.stringify(l)); this.reset(); loadNotices(); };
+    function loadNotices(){ const l=JSON.parse(localStorage.getItem('mggs_notices')||'[]'); document.getElementById('noticesList').innerHTML = l.length ? l.map(n=>'<div class="bg-white border rounded p-3 text-sm"><strong>'+n.title+'</strong><br>'+n.content+'</div>').join('') : '<p class="text-gray-500 text-sm">No notices.</p>'; }
+    function loadMessages(){ const l=JSON.parse(localStorage.getItem('mggs_messages')||'[]'); document.getElementById('messagesList').innerHTML = l.length ? l.map(m=>'<div class="bg-white border rounded p-3 text-sm"><strong>'+m.name+'</strong> '+m.phone+'<br>'+m.message+'</div>').join('') : '<p class="text-gray-500 text-sm">No messages.</p>'; }
+    loadAdmissions();
+  </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | MGGS Lalchandpura</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div class="bg-blue-900 text-white text-sm py-2 px-4">
+    <div class="max-w-6xl mx-auto flex justify-between">
+      <span>7742936593</span>
+      <a href="login.html" class="hover:text-yellow-300">Staff Login</a>
+    </div>
+  </div>
+  <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center py-3">
+      <a href="index.html" class="font-bold text-blue-900">MGGS Lalchandpura</a>
+      <div class="hidden md:flex gap-5 text-sm font-medium">
+        <a href="index.html" class="hover:text-blue-700">Home</a>
+        <a href="about.html" class="hover:text-blue-700">About</a>
+        <a href="admission.html" class="hover:text-blue-700">Admission</a>
+        <a href="notice.html" class="hover:text-blue-700">Notice</a>
+        <a href="gallery.html" class="text-blue-800 border-b-2 border-yellow-400">Gallery</a>
+        <a href="contact.html" class="hover:text-blue-700">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="bg-blue-800 text-white py-10 px-4">
+    <div class="max-w-6xl mx-auto">
+      <h1 class="text-3xl font-bold">School Gallery</h1>
+      <p class="text-blue-200 mt-1">Photos from school events and activities</p>
+    </div>
+  </div>
+
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <div id="galleryGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+    <p class="text-center text-gray-500 text-sm mt-8">Teachers can upload photos from the dashboard (Local Storage).</p>
+  </main>
+
+  <footer class="bg-gray-900 text-gray-400 py-6 text-center text-sm">© 2026 MGGS Lalchandpura</footer>
+
+  <script>
+    function loadGallery() {
+      const items = JSON.parse(localStorage.getItem('mggs_gallery') || '[]');
+      const grid = document.getElementById('galleryGrid');
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white border border-dashed rounded-xl p-12 text-center text-gray-400">
+            <i class="fas fa-images text-4xl mb-3"></i>
+            <p>No photos yet. Add from Teacher Dashboard.</p>
+          </div>`;
+        return;
+      }
+      grid.innerHTML = items.map(g => `
+        <div class="bg-white rounded-xl overflow-hidden border shadow-sm">
+          <div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-400">
+            ${g.image ? `<img src="${g.image}" class="w-full h-full object-cover" alt="${g.title || ''}" />` : `<i class="fas fa-image text-3xl"></i>`}
+          </div>
+          <div class="p-2 text-xs text-center text-gray-600 truncate">${g.title || 'Photo'}</div>
+        </div>
+      `).join('');
+    }
+    loadGallery();
+  </script>
+</body>
+</html>

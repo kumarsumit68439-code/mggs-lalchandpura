@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supabase Login | MGGS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+    <div class="bg-blue-900 text-white text-center py-6 px-6">
+      <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-2">MG</div>
+      <h1 class="text-lg font-bold">Staff Login</h1>
+      <p class="text-blue-200 text-xs mt-1">Email / Password</p>
+    </div>
+    <div class="p-6 space-y-4">
+      <div id="authMsg" class="hidden mb-2 p-3 rounded-lg text-sm"></div>
+      <input type="email" id="email" placeholder="Email" class="w-full border rounded-lg px-3 py-2.5" />
+      <input type="password" id="password" placeholder="Password" class="w-full border rounded-lg px-3 py-2.5" />
+      <button type="button" onclick="loginEmail()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2.5 rounded-lg">Login</button>
+      <p class="text-xs text-center text-gray-500">Demo: principal@mggs.local / principal123</p>
+      <a href="google-login.html" class="block text-center text-blue-600 text-sm">Google Login →</a>
+      <a href="index.html" class="block text-center text-gray-500 text-sm">← Home</a>
+    </div>
+  </div>
+  <script>
+    const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    let sb = null;
+    try { if (!SUPABASE_URL.includes('YOUR_PROJECT')) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){}
+    function showMsg(t,ok){ const el=document.getElementById('authMsg'); el.textContent=t; el.className='mb-2 p-3 rounded-lg text-sm '+(ok?'bg-green-50 text-green-800':'bg-red-50 text-red-700'); el.classList.remove('hidden'); }
+    function setSession(u){ localStorage.setItem('mggs_session', JSON.stringify(u)); location.href='dashboard.html'; }
+    const demo=[{email:'principal@mggs.local',password:'principal123',role:'principal',name:'Principal'},{email:'teacher@mggs.local',password:'teacher123',role:'teacher',name:'Teacher'}];
+    async function loginEmail(){
+      const email=document.getElementById('email').value.trim();
+      const password=document.getElementById('password').value;
+      if(!email||!password) return showMsg('Email & password required');
+      if(sb){
+        const {data,error}=await sb.auth.signInWithPassword({email,password});
+        if(error) return showMsg(error.message);
+        setSession({id:data.user.id,email:data.user.email,name:data.user.user_metadata?.name||email,role:data.user.user_metadata?.role||'teacher',provider:'supabase'});
+      } else {
+        const u=demo.find(x=>x.email===email&&x.password===password);
+        if(!u) return showMsg('Invalid. Use principal@mggs.local / principal123');
+        setSession({...u,provider:'demo'});
+      }
+    }
+  </script>
+</body>
+</html>
